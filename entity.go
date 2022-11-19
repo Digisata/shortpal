@@ -7,5 +7,5 @@ import (
 type Url struct {
 	gorm.Model
 	OriginUrl string
-	ShortUrl  string
+	ShortUrl  string `gorm:"uniqueIndex"`
 }

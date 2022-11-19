@@ -29,7 +29,7 @@ func (s *service) ShortenUrl(input ShortenUrlInput) (Url, error) {
 
 	url.ShortUrl = shortUrl
 
-	newUrl, err := s.repository.Save(url)
+	newUrl, err := s.repository.UpdateOrCreate(url)
 	if err != nil {
 		return newUrl, err
 	}

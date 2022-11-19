@@ -10,7 +10,7 @@ import (
 )
 
 type Repository interface {
-	Save(url Url) (Url, error)
+	UpdateOrCreate(url Url) (Url, error)
 	FindByShortUrl(shortUrl string) (Url, error)
 }
 
@@ -23,10 +23,12 @@ func NewRepository(db *gorm.DB, rdb *redis.Client) *repository {
 	return &repository{db: db, rdb: rdb}
 }
 
-func (r *repository) Save(url Url) (Url, error) {
-	err := r.db.Create(&url).Error
-	if err != nil {
-		return url, err
+func (r *repository) UpdateOrCreate(url Url) (Url, error) {
+	if r.db.Model(&url).Where("short_url = ?", url.ShortUrl).Updates(&url).RowsAffected == 0 {
+		err := r.db.Create(&url).Error
+		if err != nil {
+			return url, err
+		}
 	}
 
 	return url, nil

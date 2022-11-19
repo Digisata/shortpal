@@ -57,11 +57,11 @@ func main() {
 	service := NewService(repository)
 	handler := NewHandler(service)
 
+	gin.SetMode(os.Getenv("GIN_MODE"))
 	router := gin.Default()
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"*"}
 	config.AllowMethods = []string{"GET", "POST"}
-	config.AllowHeaders = []string{"Content-Type"}
 	router.Use(cors.New(config))
 
 	router.GET("/:SHORTURL", handler.RedirectToOriginUrl)
