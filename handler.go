@@ -31,14 +31,14 @@ func (h handler) ShortenUrl(c *gin.Context) {
 		return
 	}
 
-	_, err = url.ParseRequestURI(input.OriginUrl)
+	_, err = url.ParseRequestURI(input.Url)
 	if err != nil {
 		response := helper.APIResponse("Invalid URL format", "error", http.StatusBadRequest, err.Error())
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	newUrl, err := h.service.ShortenUrl(input)
+	newUrl, err := h.service.ShortenUrl(input, c.Request.Context())
 	if err != nil {
 		response := helper.APIResponse("Failed to shorten url", "error", http.StatusInternalServerError, err.Error())
 		c.JSON(http.StatusInternalServerError, response)
@@ -52,7 +52,7 @@ func (h handler) ShortenUrl(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (h handler) RedirectToOriginUrl(c *gin.Context) {
+func (h handler) Redirect(c *gin.Context) {
 	var input GetUrlDetailInput
 
 	err := c.ShouldBindUri(&input)
@@ -62,12 +62,12 @@ func (h handler) RedirectToOriginUrl(c *gin.Context) {
 		return
 	}
 
-	url, err := h.service.GetUrlByShortUrl(input.ShortUrl)
+	url, err := h.service.Redirect(input.ShortUrl, c.Request.Context())
 	if err != nil {
 		response := helper.APIResponse("Failed to redirect", "error", http.StatusNotFound, err.Error())
 		c.JSON(http.StatusNotFound, response)
 		return
 	}
 
-	c.Redirect(http.StatusFound, url.OriginUrl)
+	c.Redirect(http.StatusFound, url.Url)
 }

@@ -45,7 +45,7 @@ func main() {
 	if errCon != nil {
 		panic("failed to connect database")
 	}
-	db.AutoMigrate(&Url{})
+	db.AutoMigrate(&Url{}, &ShortUrl{})
 
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("RDB_HOST"),
@@ -53,7 +53,10 @@ func main() {
 		DB:       0,
 	})
 
-	repository := NewRepository(db, rdb)
+	repository, err := NewRepository(db, rdb)
+	if err != nil {
+		panic(err)
+	}
 	service := NewService(repository)
 	handler := NewHandler(service)
 
@@ -64,7 +67,7 @@ func main() {
 	config.AllowMethods = []string{"GET", "POST"}
 	router.Use(cors.New(config))
 
-	router.GET("/:SHORTURL", handler.RedirectToOriginUrl)
+	router.GET("/:SHORTURL", handler.Redirect)
 
 	api := router.Group("/api/v1")
 

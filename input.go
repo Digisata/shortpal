@@ -1,7 +1,7 @@
 package main
 
 type ShortenUrlInput struct {
-	OriginUrl string `json:"origin_url" binding:"required"`
+	Url string `json:"url" binding:"required"`
 }
 
 type GetUrlDetailInput struct {

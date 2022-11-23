@@ -6,6 +6,12 @@ import (
 
 type Url struct {
 	gorm.Model
-	OriginUrl string
-	ShortUrl  string `gorm:"uniqueIndex"`
+	Url      string
+	ShortUrl []ShortUrl `gorm:"foreignKey:IdUrl"`
+}
+
+type ShortUrl struct {
+	gorm.Model
+	IdUrl    uint
+	ShortUrl string
 }

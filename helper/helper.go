@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"math/big"
+	"math/rand"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/itchyny/base58-go"
@@ -45,9 +46,9 @@ func FormatValidationError(err error) []string {
 	return errors
 }
 
-func sha256Of(originUrl string) ([]byte, error) {
+func sha256Of(url string) ([]byte, error) {
 	algorithm := sha256.New()
-	_, err := algorithm.Write([]byte(originUrl))
+	_, err := algorithm.Write([]byte(url))
 	if err != nil {
 		return nil, err
 	}
@@ -63,17 +64,22 @@ func base58Encoded(bytes []byte) (string, error) {
 	return string(encoded), nil
 }
 
-func GenerateShortUrl(originUrl string) (string, error) {
-	urlHashBytes, err := sha256Of(originUrl)
+func GenerateShortLink(url string) (string, error) {
+	urlHashBytes, err := sha256Of(url)
 	if err != nil {
 		return "", err
 	}
 
 	generatedNumber := new(big.Int).SetBytes(urlHashBytes).Uint64()
-	finalString, err := base58Encoded([]byte(fmt.Sprintf("%d", generatedNumber)))
+	generatedString, err := base58Encoded([]byte(fmt.Sprintf("%d", generatedNumber)))
 	if err != nil {
 		return "", err
 	}
 
-	return finalString[:8], nil
+	inRune := []rune(generatedString)
+	rand.Shuffle(len(inRune), func(i, j int) {
+		inRune[i], inRune[j] = inRune[j], inRune[i]
+	})
+
+	return string(inRune)[:8], nil
 }
