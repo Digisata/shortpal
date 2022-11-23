@@ -8,6 +8,7 @@ require (
 	github.com/go-playground/validator/v10 v10.10.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/itchyny/base58-go v0.2.0
+	github.com/joho/godotenv v1.4.0
 	gorm.io/driver/postgres v1.4.5
 	gorm.io/gorm v1.24.1
 )
