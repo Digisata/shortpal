@@ -10,14 +10,14 @@ import (
 )
 
 type handler struct {
-	service Service
+	service *Service
 }
 
-func NewHandler(service Service) *handler {
+func NewHandler(service *Service) *handler {
 	return &handler{service: service}
 }
 
-func (h *handler) ShortenUrl(c *gin.Context) {
+func (h handler) ShortenUrl(c *gin.Context) {
 	var input ShortenUrlInput
 
 	err := c.ShouldBindJSON(&input)
@@ -52,7 +52,7 @@ func (h *handler) ShortenUrl(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *handler) RedirectToOriginUrl(c *gin.Context) {
+func (h handler) RedirectToOriginUrl(c *gin.Context) {
 	var input GetUrlDetailInput
 
 	err := c.ShouldBindUri(&input)

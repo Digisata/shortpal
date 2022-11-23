@@ -9,21 +9,16 @@ import (
 	"gorm.io/gorm"
 )
 
-type Repository interface {
-	UpdateOrCreate(url Url) (Url, error)
-	FindByShortUrl(shortUrl string) (Url, error)
-}
-
-type repository struct {
+type Repository struct {
 	db  *gorm.DB
 	rdb *redis.Client
 }
 
-func NewRepository(db *gorm.DB, rdb *redis.Client) *repository {
-	return &repository{db: db, rdb: rdb}
+func NewRepository(db *gorm.DB, rdb *redis.Client) *Repository {
+	return &Repository{db: db, rdb: rdb}
 }
 
-func (r *repository) UpdateOrCreate(url Url) (Url, error) {
+func (r Repository) UpdateOrCreate(url Url) (Url, error) {
 	var ctx = context.Background()
 
 	if r.db.Model(&url).Where("short_url = ?", url.ShortUrl).Updates(&url).RowsAffected == 0 {
@@ -46,7 +41,7 @@ func (r *repository) UpdateOrCreate(url Url) (Url, error) {
 	return url, nil
 }
 
-func (r *repository) FindByShortUrl(shortUrl string) (Url, error) {
+func (r Repository) FindByShortUrl(shortUrl string) (Url, error) {
 	var url Url
 	var ctx = context.Background()
 

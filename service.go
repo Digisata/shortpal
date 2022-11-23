@@ -4,20 +4,15 @@ import (
 	"github.com/Digisata/shortpal/helper"
 )
 
-type Service interface {
-	ShortenUrl(input ShortenUrlInput) (Url, error)
-	GetUrlByShortUrl(shortUrl string) (Url, error)
+type Service struct {
+	repository *Repository
 }
 
-type service struct {
-	repository Repository
+func NewService(repository *Repository) *Service {
+	return &Service{repository: repository}
 }
 
-func NewService(repository Repository) *service {
-	return &service{repository: repository}
-}
-
-func (s *service) ShortenUrl(input ShortenUrlInput) (Url, error) {
+func (s Service) ShortenUrl(input ShortenUrlInput) (Url, error) {
 	url := Url{
 		OriginUrl: input.OriginUrl,
 	}
@@ -37,7 +32,7 @@ func (s *service) ShortenUrl(input ShortenUrlInput) (Url, error) {
 	return newUrl, nil
 }
 
-func (s *service) GetUrlByShortUrl(shortUrl string) (Url, error) {
+func (s Service) GetUrlByShortUrl(shortUrl string) (Url, error) {
 	url, err := s.repository.FindByShortUrl(shortUrl)
 	if err != nil {
 		return url, err
