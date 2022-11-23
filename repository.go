@@ -24,8 +24,20 @@ func NewRepository(db *gorm.DB, rdb *redis.Client) *repository {
 }
 
 func (r *repository) UpdateOrCreate(url Url) (Url, error) {
+	var ctx = context.Background()
+
 	if r.db.Model(&url).Where("short_url = ?", url.ShortUrl).Updates(&url).RowsAffected == 0 {
 		err := r.db.Create(&url).Error
+		if err != nil {
+			return url, err
+		}
+
+		dataJson, err := json.Marshal(url)
+		if err != nil {
+			return url, err
+		}
+
+		err = r.rdb.Set(ctx, url.ShortUrl, string(dataJson), 10800*time.Second).Err()
 		if err != nil {
 			return url, err
 		}
